@@ -456,10 +456,20 @@ local-llm-mcp/
 ├── eslint.config.js      # ESLint flat config (recommended rules only, no style/formatting)
 ├── package.json          # Node.js dependencies
 ├── README.md             # This file
+├── NOTICE                # Attribution to the original project and the modification notice
 ├── AGENTS.md             # Priming notes for coding agents working in this repo
 ├── TEST.md               # Manual test cases and validation guide
 └── .gitignore             # Git ignore patterns
 ```
+
+## Origin and licence
+
+This project began as a fork of [Jadael/OllamaClaude](https://github.com/Jadael/OllamaClaude),
+an MCP server that lets Claude Code use a local Ollama server, and has been substantially
+modified since 2026-08-18 (among other things it now targets any OpenAI-compatible server
+and any MCP-speaking coding agent). Like the original it is licensed under the
+[GNU Affero General Public License v3.0](LICENSE). See [NOTICE](NOTICE) for the attribution and
+the modification notice, and [CHANGELOG.md](CHANGELOG.md) for what changed.
 
 ## Contributing & Future Improvements
 

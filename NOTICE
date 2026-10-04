@@ -1,0 +1,16 @@
+local-llm-mcp
+
+This program is a modified version of OllamaClaude by Jadael
+(https://github.com/Jadael/OllamaClaude), an MCP server that lets Claude Code use a
+local Ollama server. The original is licensed under the GNU Affero General Public
+License v3.0, and so is this program (AGPL-3.0-only; see LICENSE). The original's code
+and history up to 2025-10-24 are part of this repository's git history.
+
+Modifications: since 2026-08-18 this repository has been substantially modified by
+Holger Reinhardt (https://github.com/hlgr360). Among other changes it was generalised
+from a local Ollama server to any OpenAI-compatible server (llama.cpp's llama-server,
+vLLM, LM Studio) and to any MCP-speaking coding agent. The changes are listed in
+CHANGELOG.md and in the git history, with dates.
+
+The original copyright notices and licence terms of the upstream project continue to
+apply to the parts derived from it.
