@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased - Attribution
+
+### Documentation
+- Credit the original project: this repository is a fork of
+  [Jadael/OllamaClaude](https://github.com/Jadael/OllamaClaude) (AGPL-3.0). Added a `NOTICE` file
+  with the attribution and the modification notice (what and since when), an "Origin and licence"
+  section in the README, and the original author in `package.json`.
+
 ## Version 3.1.4 - Qwen3 prompt overrides for plain-text output, plus test coverage
 
 ### Features

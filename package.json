@@ -12,7 +12,14 @@
   "files": [
     "index.js",
     "prompts.js",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "NOTICE"
+  ],
+  "contributors": [
+    {
+      "name": "Jadael (original OllamaClaude)",
+      "url": "https://github.com/Jadael/OllamaClaude"
+    }
   ],
   "repository": {
     "type": "git",
