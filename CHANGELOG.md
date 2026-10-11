@@ -1,5 +1,40 @@
 # Changelog
 
+## Version 3.6.0 - Embed-only mode for embedding-model backends
+
+### Features
+- **`LOCAL_LLM_EMBED_ONLY`**: set it (`1`/`true`/`yes`/`on`, case-insensitive) to front an
+  embedding model instead of a generative one. An embedding backend serves `/v1/embeddings`
+  and `/tokenize` but has no chat-completion endpoint and usually no chat template, so the
+  fourteen chat-backed tools can only ever fail against it. In this mode `ListTools` is
+  filtered to the three tools such a backend can serve (`semantic_similarity`, `tokenize`,
+  `server_info`), the MCP `instructions` describe an embedding server rather than code
+  offloading, and `server_info` reports `embed_only`. A chat tool called anyway — by a client
+  holding a tool list from before the flag was set — fails with an error naming the mode and
+  the available tools, instead of a 404 from `/v1/chat/completions` or a missing-template
+  error from the backend. The motivating case is one agent with several of these servers
+  configured at once, where an embeddings backend would otherwise contribute fourteen tools
+  indistinguishable from the generative server's.
+
+### Fixes
+- **`semantic_similarity` now rejects non-numeric embeddings** instead of reporting every
+  score as `null`. A backend can answer `200` with correctly-shaped vectors whose elements
+  are all NaN — found immediately when smoke-testing embed-only mode against a real
+  `llama-server` fronting `nomic-embed-text-v1.5` on a Vulkan build, where both
+  `/v1/embeddings` and the legacy `/embedding` returned 768 nulls. `cosineSimilarity` over
+  those returns NaN, which `JSON.stringify` renders as `null`, so the call *looked* like a
+  success and returned a meaningless ranking. The mock backend never produced this, so no
+  existing test caught it.
+
+### Tests
+- `test/embed-only.test.js` spawns the real entry point with `LOCAL_LLM_EMBED_ONLY=1` and
+  asserts over MCP JSON-RPC: the exact three-tool `tools/list`, embedding-specific
+  `instructions` (and the absence of the file-aware steering), `semantic_similarity` and
+  `tokenize` still working, a filtered chat tool erroring *without* reaching
+  `/v1/chat/completions`, and `embed_only: true` in `server_info`. Its own process, since
+  the flag is read at module import time like `LOCAL_LLM_BASE_URL`.
+- Added an all-NaN embedding case to `test/server.test.js`'s `semanticSimilarity` suite.
+
 ## Version 3.5.0 - Prompt hook that points Claude at the right tool
 
 ### Added

@@ -549,6 +549,18 @@ describe("semanticSimilarity", () => {
     assert.doesNotMatch(result.content[0].text, /0\.9,\s*0\.1,\s*0/);
   });
 
+  test("rejects all-NaN vectors instead of reporting every score as null", async () => {
+    // Shape is right, contents aren't: what llama-server returns for nomic-embed-text on a
+    // compute backend that can't actually run it. JSON-serializes as [null, null, null].
+    mock.state.embeddings = (inputs) => inputs.map(() => [NaN, NaN, NaN]);
+
+    const server = new LocalLlmServer();
+    await assert.rejects(
+      () => server.semanticSimilarity({ query: "a", candidates: ["b"] }),
+      /non-numeric embedding/
+    );
+  });
+
   test("resolves the model before requesting embeddings, same as other tools", async () => {
     mock.state.embeddings = (inputs) => inputs.map(() => [1, 1, 1]);
     const server = new LocalLlmServer();

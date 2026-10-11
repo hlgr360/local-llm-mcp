@@ -10,7 +10,7 @@
       "name": "local-llm-mcp",
       "source": "./",
       "description": "Offload code-shaped work to a local LLM server (llama.cpp, vLLM, LM Studio), with an optional Read-gate hook nudging Claude Code toward the file-aware tools.",
-      "version": "3.5.0"
+      "version": "3.6.0"
     }
   ]
 }

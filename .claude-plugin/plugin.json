@@ -2,7 +2,7 @@
   "$schema": "https://anthropic.com/claude-code/plugin.schema.json",
   "name": "local-llm-mcp",
   "description": "Offload code-shaped work (generation, review, refactoring, test-writing) to a local LLM server, plus an optional Read-gate hook that nudges Claude Code toward the file-aware tools instead of reading whole files by hand.",
-  "version": "3.5.0",
+  "version": "3.6.0",
   "author": {
     "name": "Holger Reinhardt",
     "url": "https://github.com/hlgr360"

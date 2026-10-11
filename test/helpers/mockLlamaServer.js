@@ -6,7 +6,7 @@ import http from "http";
 // are recorded in `state.requests` so tests can assert on what was sent.
 // Set `state.modelIds` (an array) instead of `state.modelId` to simulate a
 // multi-model router reporting more than one loaded model.
-export function startMockLlamaServer() {
+export function startMockLlamaServer({ socketPath } = {}) {
   const state = {
     modelId: "mock-org/mock-model-7b",
     modelIds: null,
@@ -86,13 +86,16 @@ export function startMockLlamaServer() {
   });
 
   return new Promise((resolve) => {
-    server.listen(0, "127.0.0.1", () => {
-      const { port } = server.address();
+    // A unix-socket mock exercises the LOCAL_LLM_SOCKET_PATH transport; the TCP
+    // path stays the default so existing callers are unaffected.
+    const ready = () =>
       resolve({
-        url: `http://127.0.0.1:${port}`,
+        url: socketPath ? "http://localhost" : `http://127.0.0.1:${server.address().port}`,
+        socketPath: socketPath ?? null,
         state,
         close: () => new Promise((r) => server.close(r)),
       });
-    });
+    if (socketPath) server.listen(socketPath, ready);
+    else server.listen(0, "127.0.0.1", ready);
   });
 }

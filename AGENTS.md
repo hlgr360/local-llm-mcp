@@ -142,6 +142,23 @@ for Ollama).
 - `LOCAL_LLM_MIN_CTX` is read once at module import time as a top-level constant.
   `LOCAL_LLM_BASE_URL` is read per lookup, but the result is cached per instance; the test
   files that each need their own mock still run in their own file/process.
+  `LOCAL_LLM_SOCKET_PATH` and `LOCAL_LLM_EMBED_ONLY` are both import-time constants, hence
+  `test/socket-transport.test.js` and `test/embed-only.test.js` each being their own
+  spawned process.
+- `LOCAL_LLM_EMBED_ONLY` filters `ListTools` down to `EMBED_ONLY_TOOLS` (the three tools an
+  embedding backend can serve: `semantic_similarity`, `tokenize`, `server_info`) and swaps
+  `SERVER_INSTRUCTIONS` for `EMBED_ONLY_INSTRUCTIONS`. **Adding a tool that doesn't need
+  `/v1/chat/completions` means adding it to `EMBED_ONLY_TOOLS` too** — the set is an
+  allowlist, so a new primitive silently stays hidden in embed-only mode otherwise. It's
+  unrelated to `resolveModel`'s capability filtering: that picks among several models on one
+  Ollama server, while this is for a server dedicated to embeddings, and is the only
+  mechanism available on a backend that reports no capabilities at all (llama-server).
+- `LOCAL_LLM_SOCKET_PATH` makes every backend call go over a unix socket. All ~20 call sites
+  go through the module-level `http` axios instance rather than bare `axios` so the socket is
+  configured once — **use `http.get`/`http.post` for any new backend call**, or it will
+  bypass socket mode. `locateServer` short-circuits in socket mode (nothing to discover; the
+  socket is the address) and returns a placeholder `http://localhost` URL that axios needs
+  for path resolution and never dials.
 - `index.js`'s shebang line, its `bin` entry in `package.json`, and the
   `import.meta.url === file://${realpathSync(process.argv[1])}` auto-start guard are all
   load-bearing for `npx github:hlgr360/local-llm-mcp` to work (the npm registry package

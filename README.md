@@ -248,6 +248,50 @@ them:
 Everything else — code generation, review, refactoring, the file-aware tools — works
 against any backend that implements standard OpenAI chat completions.
 
+### Embed-Only Mode (pointing at an embedding model)
+
+An embedding model (`nomic-embed-text`, `bge-*`, `e5-*`, …) serves `/v1/embeddings` and
+`/tokenize` but has no chat-completion endpoint and usually no chat template, so the fourteen
+chat-backed tools can only ever fail against it. Set `LOCAL_LLM_EMBED_ONLY` to register just
+the three tools such a backend can actually serve:
+
+```bash
+export LOCAL_LLM_EMBED_ONLY=1   # also accepts true/yes/on, case-insensitive
+```
+
+With it set:
+- `tools/list` returns only `local_llm_semantic_similarity`, `local_llm_tokenize`, and
+  `local_llm_server_info`.
+- The server's MCP instructions describe an embedding backend instead of code offloading, so
+  the calling agent isn't steered toward file-aware tools that aren't registered.
+- A chat tool called anyway (by a client holding a stale tool list) returns an error naming
+  the mode, without a doomed round trip to the backend.
+- `local_llm_server_info` reports `embed_only: true`.
+
+This matters most when one agent has several of these servers configured at once: without
+the flag, an embeddings backend contributes fourteen tools that look identical to the
+generative server's and fail on use. Run two entries, each with its own `LOCAL_LLM_BASE_URL`:
+
+```json
+{
+  "mcpServers": {
+    "codegen": {
+      "command": "npx",
+      "args": ["-y", "github:hlgr360/local-llm-mcp"],
+      "env": { "LOCAL_LLM_BASE_URL": "http://localhost:8081" }
+    },
+    "embed": {
+      "command": "npx",
+      "args": ["-y", "github:hlgr360/local-llm-mcp"],
+      "env": {
+        "LOCAL_LLM_BASE_URL": "http://localhost:8080",
+        "LOCAL_LLM_EMBED_ONLY": "1"
+      }
+    }
+  }
+}
+```
+
 ### 3. Configure Your MCP Client
 
 Every MCP client reads roughly the same shape of config — a command to launch the server
